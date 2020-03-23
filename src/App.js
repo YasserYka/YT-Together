@@ -1,19 +1,37 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
+
+  constructor(){
+    this.state = {
+      url: "ws://localhost:8080",
+      messages: []
+    }
+  }
+
+  socket = new WebSocket(this.state.url);
+
+  componentDidMount(){
+
+    this.socket.onopen = () => {
+      console.info('Websocket Connected');
+    }
+
+    this.socket.onmessage = event => {
+      console.info('Message received: ', JSON.parse(event.data));
+    }
+
+    this.socket.onclose = () => {
+      console.warn('Websocket Disconnected');
+    }
+  }
+
   render() {
     return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+     ths.state.messages.map(message => {
+       return <p> {message} </p>
+     })
     );
   }
 }
