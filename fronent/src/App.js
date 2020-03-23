@@ -3,16 +3,18 @@ import './App.css';
 
 class App extends Component {
 
-  constructor(){
-    this.state = {
-      url: "ws://localhost:8080",
-      messages: []
-    }
+  state = {
+    url: "ws://localhost:8080",
+    messages: []
   }
 
   socket = new WebSocket(this.state.url);
 
-  addMessage = message => this.setState(state => ({message: [...state.messages, message]}));
+  addMessage = message => {
+    this.setState({
+      messages: this.state.messages.concat(message)
+    });
+  }
 
   sendMessage = message => this.socket.send(JSON.stringify({message: message}));
 
@@ -23,7 +25,7 @@ class App extends Component {
     }
 
     this.socket.onmessage = event => {
-      console.info('Message received: ', JSON.parse(event.data));
+      this.addMessage(JSON.parse(event.data).message);
     }
 
     this.socket.onclose = () => {
@@ -33,9 +35,9 @@ class App extends Component {
 
   render() {
     return (
-     ths.state.messages.map(message => {
-       return <p> {message} </p>
-     })
+      this.state.messages.map((message, index) => {
+        return <div key={index}> {message} </div>
+      })
     );
   }
 }
