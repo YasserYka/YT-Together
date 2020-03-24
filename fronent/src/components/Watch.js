@@ -11,6 +11,9 @@ class Watch extends Component {
 
     this.updateDetails = this.updateDetails.bind(this);
     this.pauseVideo = this.pauseVideo.bind(this);
+    this.seekTo = this.seekTo.bind(this);
+    this.playVideo = this.playVideo.bind(this);
+    this.onStateChange = this.onStateChange.bind(this);
   }
 
     componentDidMount(){
@@ -20,6 +23,7 @@ class Watch extends Component {
           videoId: 'M7lc1UVf-VE',
           events: {
             'onReady': this.onPlayerReady,
+            'onStateChange' : this.onStateChange
           }
         });
       }
@@ -36,9 +40,25 @@ class Watch extends Component {
         loadVideo();
       }
     }
+
     onPlayerReady = event => event.target.playVideo();
 
     updateDetails = () => this.setState({currentTime: this.player.getCurrentTime()});
+
+    pauseVideo = () => this.player.pauseVideo();
+
+    playVideo = () => this.player.playVideo();
+
+    seekTo = (second) => this.player.seekTo(second, false);
+
+    onStateChange = event => {
+      if(event.data == 0)
+        console.info("Video Ended!");
+      else if(event.data == 1)
+        console.info("Video is Playing!");
+      else if(event.data == 2)
+        console.info("Video Paused!");
+    };
 
     render () {
         return (
