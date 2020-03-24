@@ -2,42 +2,53 @@ import React, { Component } from 'react';
 
 class Watch extends Component {
 
+  constructor(props){
+    super(props);
+
+    this.state = {
+      currentTime: 0
+    }
+
+    this.updateDetails = this.updateDetails.bind(this);
+    this.pauseVideo = this.pauseVideo.bind(this);
+  }
+
     componentDidMount(){
 
+      const loadVideo = () => {
+        this.player = new window.YT.Player('player', {
+          videoId: 'M7lc1UVf-VE',
+          events: {
+            'onReady': this.onPlayerReady,
+          }
+        });
+      }
+      
       if(!window.YT){
         const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
+        tag.src = "http://www.youtube.com/iframe_api";
 
-        window.onYouTubeIframeAPIReady = this.loadVideo;
+        window.onYouTubeIframeAPIReady = loadVideo;
 
         const firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
       } else {
-        this.loadVideo();
+        loadVideo();
       }
     }
+    onPlayerReady = event => event.target.playVideo();
 
-    onPlayerReady = event => {event.target.playVideo()};
-
-    loadVideo = () => {
-
-      this.player = new window.YT.Player('player', {
-        height: '390',
-        width: '640',
-        videoId: 'M7lc1UVf-VE',
-        events: {
-          'onReady': this.onPlayerReady,
-        }
-      });
-
-    }
-
+    updateDetails = () => this.setState({currentTime: this.player.getCurrentTime()});
 
     render () {
         return (
-            <React.Fragment>
-                <div id="player"></div>
-            </React.Fragment>
+          <React.Fragment>
+            <div className="embed-responsive embed-responsive-16by9">
+              <div className="embed-responsive-item" id="player"></div>
+            </div>
+            <button onClick={this.updateDetails}>Upadate</button>
+            <h5>{this.state.currentTime}</h5>
+          </React.Fragment>
         )
     }
 }
