@@ -6,7 +6,8 @@ class Watch extends Component {
     super(props);
 
     this.state = {
-      currentTime: 0
+      currentTime: 0,
+      videoId: 'M7lc1UVf-VE'
     }
 
     this.updateDetails = this.updateDetails.bind(this);
@@ -16,13 +17,17 @@ class Watch extends Component {
     this.onStateChange = this.onStateChange.bind(this);
     this.videoForwarded = this.videoForwarded.bind(this);
     this.sync = this.sync.bind(this);
+    this.currentStatus = this.currentStatus.bind(this);
+    this.changeVideo = this.changeVideo.bind(this);
   }
 
   componentDidMount(){
 
+    console.log('? ', this.props.socket)
+
     const loadVideo = () => {
       this.player = new window.YT.Player('player', {
-        videoId: 'M7lc1UVf-VE',
+        videoId: this.state.videoId,
         events: {
           'onReady': this.onPlayerReady,
           'onStateChange' : this.onStateChange
@@ -43,6 +48,8 @@ class Watch extends Component {
     }
   }
 
+  changeVideo = id => this.player.loadVideoById(id);
+
   onStateChange = event => this.videoForwarded(event.data);
 
   onPlayerReady = event => event.target.playVideo();
@@ -55,16 +62,17 @@ class Watch extends Component {
 
   seekTo = second => this.player.seekTo(second, false);
 
-  sync = () => {
-    if(true);
-  }
+  sync = () => this.props.socket.send(this.currentStatus());
+
+  currentStatus = () => ({
+    currentTime: this.player.getCurrentTime(),
+  });
 
   videoForwarded = triggered => {
     if(triggered === 1)
       this.sync();
   }
-
-
+  
   render () {
       return (
         <React.Fragment>
