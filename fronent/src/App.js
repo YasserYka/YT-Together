@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 
-import Watch from "./components/Watch";
 import Index from "./components/layout/Index";
 
 import './App.css';
@@ -40,16 +38,9 @@ class App extends Component {
 
   render() {
     return (
-      <Router>
-        <React.Fragment>
-          <div className="container">
-            <Switch>
-              <Route exact path="/" component={Index} />
-              <Route exact path="/Watch" component={Watch} />
-            </Switch>
-          </div>
-        </React.Fragment>
-      </Router>
+      <div className="container">
+        <Index socket={this.socket} />
+      </div>
     );
   }
 }

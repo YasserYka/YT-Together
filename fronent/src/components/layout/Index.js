@@ -1,10 +1,10 @@
 import React from 'react';
 import Watch from '../Watch';
 
-const Index = () => {
+const Index = (props) => {
     return (
         <React.Fragment>
-            <Watch />
+            <Watch socket={props.socket} />
         </React.Fragment>
     )
 }
