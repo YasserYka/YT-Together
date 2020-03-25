@@ -6,13 +6,11 @@ class Watch extends Component {
     super(props);
 
     this.state = {
-      currentTime: 0,
       videoId: '00vnln25HBg',
     }
 
     this.youHaveControll = false;
 
-    this.updateDetails = this.updateDetails.bind(this);
     this.pauseVideo = this.pauseVideo.bind(this);
     this.seekTo = this.seekTo.bind(this);
     this.playVideo = this.playVideo.bind(this);
@@ -23,6 +21,7 @@ class Watch extends Component {
     this.changeVideo = this.changeVideo.bind(this);
     this.updateVideo = this.updateVideo.bind(this);
     this.haveControll = this.haveControll.bind(this);
+    this.syncPause = this.syncPause.bind(this);
   }
 
   componentDidMount(){
@@ -63,12 +62,19 @@ class Watch extends Component {
     }
   }
 
+  syncPause = () => this.props.socket.send(JSON.stringify({
+    event: "sync",
+    action: "pause"
+  }));
+
   updateVideo = data => {
     let videoStatus = this.player.getPlayerState();
 
-    if(videoStatus === 2)
+    if(data.action === 'currenttime' && videoStatus === 2){
       this.player.playVideo();
-    this.seekTo(data.currentTime);
+      this.seekTo(data.currentTime);
+    } else if (data.action === 'pause' && videoStatus !== 2)
+      this.pauseVideo();
   }
 
   changeVideo = id => this.player.loadVideoById(id);
@@ -76,8 +82,6 @@ class Watch extends Component {
   onStateChange = event => this.changeState(event.data);
 
   onPlayerReady = event => event.target.playVideo();
-
-  updateDetails = () => this.setState({currentTime: this.player.getCurrentTime()});
 
   pauseVideo = () => this.player.pauseVideo();
 
@@ -92,12 +96,18 @@ class Watch extends Component {
 
   currentStatus = () => (JSON.stringify({
     event: "sync", 
+    action: "currenttime",
     currentTime: this.player.getCurrentTime(),
   }));
 
   changeState = triggered => {
-    if(triggered === 1 && this.youHaveControll)
-      this.sync();
+
+    if(this.youHaveControll){
+      if(triggered === 1)
+        this.sync();
+      else if(triggered === 2)
+        this.syncPause();
+    }
   }
 
   haveControll = data => this.youHaveControll = JSON.parse(data.youHaveControll);
