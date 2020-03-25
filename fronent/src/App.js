@@ -27,9 +27,6 @@ class App extends Component {
       console.info('Websocket Connected');
     }
 
-    this.socket.onmessage = event => {
-      this.addMessage(JSON.parse(event.data).message);
-    }
 
     this.socket.onclose = () => {
       console.warn('Websocket Disconnected');
