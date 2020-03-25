@@ -87,10 +87,7 @@ class Watch extends Component {
 
   playVideo = () => this.player.playVideo();
 
-  seekTo = second => {
-
-    this.player.seekTo(second, true);
-  }
+  seekTo = second => this.player.seekTo(second, true);
 
   sync = () => this.props.socket.send(this.currentStatus());
 

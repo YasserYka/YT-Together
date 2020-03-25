@@ -4,6 +4,8 @@ server.on('request', app);
 
 let assignControll = true;
 
+let rooms = []
+
 wss.on('connection', ws => {
     if(assignControll){
         ws.send(JSON.stringify({event: 'control', youHaveControll: true}));
