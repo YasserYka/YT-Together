@@ -7,9 +7,13 @@ class Index extends Component {
         super();
 
         this.state = {
-            showForm: false
+            showForm: false,
+            clickedForm: 'create',
+            errorMessage: '',
+            errorOccurred: false
         }
         this.showFormComponent = this.showFormComponent.bind(this);
+        this.sendForm = this.sendForm(this);
     }
 
     /*state = {
@@ -29,31 +33,41 @@ class Index extends Component {
           console.warn('Websocket Disconnected');
         }
     }
-
-    submitCreateRoom = event => {
-        if(event)
-            event.preventDefault();
-
-        this.socket.send(JSON.stringify({
-            event: "room",
-            action: "create",
-            roomId: this.refs.roomId.value,
-            username: this.refs.username.value
-        }));
     }*/
 
-    showFormComponent = () => this.setState({showForm: true});
+    showFormComponent = event => {
+        this.setState({showForm: true, clickedForm: event.target.value});
+    };
 
+    sendForm = event => {
+        if(event)
+        event.preventDefault();
 
+    this.socket.send(JSON.stringify({
+        event: "room",
+        action: this.state.clickedForm,
+        roomId: this.refs.roomId.value,
+        username: this.refs.username.value
+    }));
+    }
 
     render() {
         return (
-            <React.Fragment>
+            <div className="col-sm-12 my-auto">
+                {
+                    this.state.errorOccurred ? <div> this.state.errorMessage </div> : null
+                }
                 {this.state.showForm ? 
                         <form>
-                        <input type="text" ref="username" placeholder="You Username" required />
-                        <input type="text" ref="roomId" placeholder="Room Id" required />
-                        <input type="submit" value="Submit" />
+                        <div className="form-group">
+                            <input className="form-control" type="text" ref="username" placeholder="You Username" required />
+                        </div>
+                        <div className="form-group">
+                            <input className="form-control" type="text" ref="roomId" placeholder="Room Id" required />
+                        </div>
+                        <div className="form-group">
+                            <input className="form-control" type="submit" value="Submit" />
+                        </div>
                         </form> 
                         : null
                 }
@@ -61,7 +75,7 @@ class Index extends Component {
                     <button onClick={this.showFormComponent} value="create" className="btn btn-info btn-lg btn-block">Create Room</button>
                     <button onClick={this.showFormComponent} value="join" className="btn btn-secondary btn-lg btn-block">Join Room</button>
                 </div>
-            </React.Fragment>
+            </div>
             /*
             <React.Fragment>
                 <form onSubmit={this.submitCreateRoom}>
