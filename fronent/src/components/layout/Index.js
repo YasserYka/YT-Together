@@ -1,41 +1,18 @@
-import React, { Component, useRef } from 'react';
+import React, { Component } from 'react';
 import Watch from '../Watch';
+import Main from '../Main';
 
 class Index extends Component {
 
-    constructor(){
-        super();
-
-        this.state = {
+   state = {
             showForm: false,
             clickedForm: 'create',
-            errorMessage: '',
-            errorOccurred: false
-        }
-        this.showFormComponent = this.showFormComponent.bind(this);
-        this.sendForm = this.sendForm(this);
+            username: 'null',
+            roomId: 'null',
+            redirect: false
     }
 
-    /*state = {
-        url: "ws://localhost:8080",
-    }
-    
-    socket = new WebSocket(this.state.url);
-    
-    sendMessage = message => this.socket.send(JSON.stringify({message: message}));
-    
-    componentDidMount(){
-        this.socket.onopen = () => {
-          console.info('Websocket Connected');
-        }
-    
-        this.socket.onclose = () => {
-          console.warn('Websocket Disconnected');
-        }
-    }
-    }*/
-
-    showFormComponent = event => {
+    clickedForm = event => {
         this.setState({showForm: true, clickedForm: event.target.value});
     };
 
@@ -43,22 +20,30 @@ class Index extends Component {
         if(event)
         event.preventDefault();
 
-    this.socket.send(JSON.stringify({
-        event: "room",
-        action: this.state.clickedForm,
-        roomId: this.refs.roomId.value,
-        username: this.refs.username.value
-    }));
+        this.setState({username: this.refs.username.value, roomId: this.refs.roomId.value, redirect: true});
     }
 
+
     render() {
+
+        if(this.state.redirect)
+            <Redirect to={{
+                            pathname: '/Main',
+                            state: {
+                                username: this.state.username,
+                                roomId: this.state.roomId,
+                                action: this.state.clickedForm
+                            }
+                        }}
+            />
+
         return (
             <div className="col-sm-12 my-auto">
                 {
                     this.state.errorOccurred ? <div> this.state.errorMessage </div> : null
                 }
                 {this.state.showForm ? 
-                        <form>
+                        <form onSubmit={this.sendForm}>
                         <div className="form-group">
                             <input className="form-control" type="text" ref="username" placeholder="You Username" required />
                         </div>
@@ -69,22 +54,14 @@ class Index extends Component {
                             <input className="form-control" type="submit" value="Submit" />
                         </div>
                         </form> 
-                        : null
+                     
+                     : null
                 }
                 <div className="modal-body">
-                    <button onClick={this.showFormComponent} value="create" className="btn btn-info btn-lg btn-block">Create Room</button>
-                    <button onClick={this.showFormComponent} value="join" className="btn btn-secondary btn-lg btn-block">Join Room</button>
+                    <button onClick={this.showFormComponent} value="create" className="btn btn-info btn-lg btn-block active">Create Room</button>
+                    <button onClick={this.showFormComponent} value="join" className="btn btn-secondary btn-lg btn-block active">Join Room</button>
                 </div>
             </div>
-            /*
-            <React.Fragment>
-                <form onSubmit={this.submitCreateRoom}>
-                    <input type="text" ref="username" placeholder="You Username" required />
-                    <input type="text" ref="roomId" placeholder="Room Id" required />
-                    <input type="submit" value="Submit" />
-                </form>
-                <Watch socket={this.socket} />
-            </React.Fragment>*/
         )
     }
 }

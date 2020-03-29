@@ -62,10 +62,11 @@ class Watch extends Component {
     }
   }
 
-  syncPause = () => this.props.socket.send(JSON.stringify({
+  syncPause = () => {
+    this.props.socket.send(JSON.stringify({
     event: "sync",
     action: "pause"
-  }));
+  }))};
 
   updateVideo = data => {
     let videoStatus = this.player.getPlayerState();
