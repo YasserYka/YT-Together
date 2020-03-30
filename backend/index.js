@@ -13,7 +13,7 @@ wss.on('connection', ws => {
     }
     ws.on('message', message => {
         console.log(JSON.parse(message));
-        handleMessage(message, ws);
+        handleMessage(JSON.parse(message), ws);
     });
 });
 
@@ -25,9 +25,10 @@ server.listen(port, () => {
     console.log(`Listening on ${port}!`);
 });
 
-const brodcastMessage = (data, users) => {
+const brodcastMessage = (data, users, ws) => {
     users.forEach(user => {
-        user.ws.send(data);
+        if(user.ws !== ws)
+            user.ws.send(JSON.stringify(data));
     });
 }
 
@@ -36,7 +37,6 @@ const handleMessage = (data, ws) => {
     if(event === 'room')
         handleRoomEvent(data, ws);
     else if(event == 'sync'){
-        console.log(data)
         handleSyncEvent(data, ws);
     }
 }
@@ -45,38 +45,36 @@ const handleSyncEvent = (data, ws) => {
     rooms.forEach(room => {
         room.users.forEach(user => {
             if(user.ws == ws)
-                brodcastMessage(data, room.users);
+                brodcastMessage(data, room.users, ws);
         });
     });
 }
 
 const joinRoom = (data, ws) => {
-    let roomFound, statusResponse;
+    let roomNotFound = true, statusResponse;
     rooms.forEach(room => {
         if(room.roomId === data.roomId){
-            roomFound = true;
+            roomNotFound = false;
             room.users.push({username: data.username, ws: ws});
         }
     });
-
-    if(roomFound)
-        statusResponse = "ok";
-    else
-        statusResponse = "not_found";
-
-    ws.send(JSON.stringify({event: "room", action: "join", response: statusResponse}));
+    
+    if(roomNotFound)
+        createRoom(data, ws);
 }
 
 const handleRoomEvent = (data, ws) => {
     let action = data.action;
     if(action === 'create')
-        rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws}]});
+        createRoom(data, ws);
     else if(action === 'join')
         joinRoom(data, ws);
     printRooms()
 }
 
-
+const createRoom = (data, ws) => {
+    rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws}]});
+}
 
 const printRooms = () => {
     rooms.forEach(room => {

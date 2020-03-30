@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import Chat from './Chat';
 import Watch from './Watch';
 
 class Main extends Component {
@@ -33,6 +34,7 @@ class Main extends Component {
         return (
             <React.Fragment>
                 <Watch socket={this.socket} />
+                <Chat socket={this.socket} />
             </React.Fragment>
         )
     }

@@ -26,13 +26,14 @@ class Watch extends Component {
 
   componentDidMount(){
 
-    this.props.socket.onmessage = event => {
+    this.props.socket.addEventListener('message', event => {
       let data = JSON.parse(event.data);
+      console.log(data)
       if(data.event === 'control')
         this.haveControll(data)
       else if(data.event === 'sync')
         this.updateVideo(data);
-    }
+    });
 
     const loadVideo = () => {
       this.player = new window.YT.Player('player', {
@@ -57,21 +58,21 @@ class Watch extends Component {
 
       const firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    } else {
+    } else
       loadVideo();
-    }
   }
 
   syncPause = () => {
     this.props.socket.send(JSON.stringify({
-    event: "sync",
-    action: "pause"
-  }))};
+      event: "sync",
+      action: "pause"
+      })
+    )
+  };
 
   updateVideo = data => {
     let videoStatus = this.player.getPlayerState();
-
-    if(data.action === 'currenttime' && videoStatus === 2){
+    if(data.action === 'currenttime' && (videoStatus === 2 || videoStatus === -1)){
       this.player.playVideo();
       this.seekTo(data.currentTime);
     } else if (data.action === 'pause' && videoStatus !== 2)
@@ -93,13 +94,13 @@ class Watch extends Component {
   sync = () => this.props.socket.send(this.currentStatus());
 
   currentStatus = () => (JSON.stringify({
-    event: "sync", 
-    action: "currenttime",
-    currentTime: this.player.getCurrentTime(),
-  }));
+      event: "sync", 
+      action: "currenttime",
+      currentTime: this.player.getCurrentTime(),
+    })
+  );
 
   changeState = triggered => {
-
     if(this.youHaveControll){
       if(triggered === 1)
         this.sync();
@@ -108,7 +109,7 @@ class Watch extends Component {
     }
   }
 
-  haveControll = data => this.youHaveControll = JSON.parse(data.youHaveControll);
+  haveControll = data => this.youHaveControll = data.youHaveControll;
 
   render () {
       return (
@@ -116,8 +117,6 @@ class Watch extends Component {
           <div className="embed-responsive embed-responsive-16by9">
             <div className="embed-responsive-item" id="player"></div>
           </div>
-          <button onClick={this.updateDetails}>Upadate</button>
-          <h5>{this.state.currentTime}</h5>
         </React.Fragment>
       )
   }
