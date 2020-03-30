@@ -47,8 +47,7 @@ class Watch extends Component {
           'onStateChange' : this.onStateChange
         },
       });
-    }
-    
+    } 
 
     if(!window.YT){
       const tag = document.createElement('script');

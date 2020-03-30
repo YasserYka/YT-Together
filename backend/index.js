@@ -17,10 +17,6 @@ wss.on('connection', ws => {
     });
 });
 
-wss.on('close', () => {
-    console.log('Closed');
-});
-
 server.listen(port, () => {
     console.log(`Listening on ${port}!`);
 });
@@ -34,11 +30,23 @@ const brodcastMessage = (data, users, ws) => {
 
 const handleMessage = (data, ws) => {
     let event = data.event;
+    console.log(event)
+    console.log(event === 'chat')
     if(event === 'room')
         handleRoomEvent(data, ws);
-    else if(event == 'sync'){
+    else if(event === 'sync')
         handleSyncEvent(data, ws);
-    }
+    else if(event === 'chat')
+        handleChatEvent(data, ws);
+}
+
+const handleChatEvent = (data, ws) => {
+    console.log("?????????");
+    rooms.forEach(room => {
+        console.log(room.roomId === data.roomId)
+        if(room.roomId === data.roomId)
+            brodcastMessage(data, room.users, ws);
+    });
 }
 
 const handleSyncEvent = (data, ws) => {
