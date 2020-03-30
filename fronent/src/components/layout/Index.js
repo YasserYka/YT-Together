@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import Watch from '../Watch';
-import Main from '../Main';
+import { Redirect } from "react-router-dom";
 
 class Index extends Component {
 
@@ -12,11 +11,11 @@ class Index extends Component {
             redirect: false
     }
 
-    clickedForm = event => {
+    clickedFormHandler = event => {
         this.setState({showForm: true, clickedForm: event.target.value});
     };
 
-    sendForm = event => {
+    submitHandler = event => {
         if(event)
         event.preventDefault();
 
@@ -26,9 +25,9 @@ class Index extends Component {
 
     render() {
 
-        if(this.state.redirect)
-            <Redirect to={{
-                            pathname: '/Main',
+        if(this.state.redirect){
+            return <Redirect to={{
+                            pathname: '/main',
                             state: {
                                 username: this.state.username,
                                 roomId: this.state.roomId,
@@ -36,6 +35,7 @@ class Index extends Component {
                             }
                         }}
             />
+        }
 
         return (
             <div className="col-sm-12 my-auto">
@@ -43,7 +43,7 @@ class Index extends Component {
                     this.state.errorOccurred ? <div> this.state.errorMessage </div> : null
                 }
                 {this.state.showForm ? 
-                        <form onSubmit={this.sendForm}>
+                        <form onSubmit={this.submitHandler}>
                         <div className="form-group">
                             <input className="form-control" type="text" ref="username" placeholder="You Username" required />
                         </div>
@@ -58,8 +58,8 @@ class Index extends Component {
                      : null
                 }
                 <div className="modal-body">
-                    <button onClick={this.showFormComponent} value="create" className="btn btn-info btn-lg btn-block active">Create Room</button>
-                    <button onClick={this.showFormComponent} value="join" className="btn btn-secondary btn-lg btn-block active">Join Room</button>
+                    <button onClick={this.clickedFormHandler} value="create" className="btn btn-info btn-lg btn-block active">Create Room</button>
+                    <button onClick={this.clickedFormHandler} value="join" className="btn btn-secondary btn-lg btn-block active">Join Room</button>
                 </div>
             </div>
         )

@@ -13,8 +13,7 @@ wss.on('connection', ws => {
     }
     ws.on('message', message => {
         console.log(JSON.parse(message));
-        handleMessage(JSON.parse(message), ws)
-       // brodcastMessage(ws, message)
+        handleMessage(message, ws);
     });
 });
 
@@ -36,8 +35,10 @@ const handleMessage = (data, ws) => {
     let event = data.event;
     if(event === 'room')
         handleRoomEvent(data, ws);
-    else if(event == 'sync')
+    else if(event == 'sync'){
+        console.log(data)
         handleSyncEvent(data, ws);
+    }
 }
 
 const handleSyncEvent = (data, ws) => {
@@ -50,10 +51,20 @@ const handleSyncEvent = (data, ws) => {
 }
 
 const joinRoom = (data, ws) => {
+    let roomFound, statusResponse;
     rooms.forEach(room => {
-        if(room.roomId === data.roomId)
+        if(room.roomId === data.roomId){
+            roomFound = true;
             room.users.push({username: data.username, ws: ws});
+        }
     });
+
+    if(roomFound)
+        statusResponse = "ok";
+    else
+        statusResponse = "not_found";
+
+    ws.send(JSON.stringify({event: "room", action: "join", response: statusResponse}));
 }
 
 const handleRoomEvent = (data, ws) => {
@@ -62,6 +73,7 @@ const handleRoomEvent = (data, ws) => {
         rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws}]});
     else if(action === 'join')
         joinRoom(data, ws);
+    printRooms()
 }
 
 
