@@ -30,8 +30,6 @@ const brodcastMessage = (data, users, ws) => {
 
 const handleMessage = (data, ws) => {
     let event = data.event;
-    console.log(event)
-    console.log(event === 'chat')
     if(event === 'room')
         handleRoomEvent(data, ws);
     else if(event === 'sync')
@@ -41,7 +39,6 @@ const handleMessage = (data, ws) => {
 }
 
 const handleChatEvent = (data, ws) => {
-    console.log("?????????");
     rooms.forEach(room => {
         console.log(room.roomId === data.roomId)
         if(room.roomId === data.roomId)
