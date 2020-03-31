@@ -21,7 +21,7 @@ class Main extends Component {
         this.socket.send(JSON.stringify({
                 event: "room",
                 action: this.props.location.state.action,
-                username: this.props.username,
+                username: this.state.username,
                 roomId: this.state.roomId
             })
           );

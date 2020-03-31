@@ -65,6 +65,9 @@ const joinRoom = (data, ws) => {
     
     if(roomNotFound)
         createRoom(data, ws);
+    else
+        notifyRoommates(data, ws);
+
 }
 
 const handleRoomEvent = (data, ws) => {
@@ -73,7 +76,17 @@ const handleRoomEvent = (data, ws) => {
         createRoom(data, ws);
     else if(action === 'join')
         joinRoom(data, ws);
-    printRooms()
+}
+
+const notifyRoommates = (data, ws) => {
+    rooms.forEach(room => {
+        if(room.roomId === data.roomId)
+                brodcastMessage({      
+                    event: 'online',
+                    action: 'joined',
+                    username: data.username
+                },  room.users, ws);
+    });
 }
 
 const createRoom = (data, ws) => {

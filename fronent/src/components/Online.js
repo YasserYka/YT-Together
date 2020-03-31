@@ -21,9 +21,9 @@ class Online extends Component {
     }
 
     handleMessage = data => {
-        if(data.event === 'joined')
+        if(data.action === 'joined')
             this.setState({users: [...this.state.users, data.username,]});
-        else if(data.event === 'left')
+        else if(data.action === 'left')
             this.setState(prevState => {
                     users: prevState.users.filter(user => user !== data.username);
                 }
@@ -37,12 +37,9 @@ class Online extends Component {
             <div className="align-self-center w-50 p-3">
                 <div className="card-header">Online Users </div>
                 <ul className="list-group">
-                    <li className="list-group-item">Cras justo odio</li>
-                    <li className="list-group-item">Dapibus ac facilisis in</li>
-                    <li className="list-group-item">Vestibulum at eros</li>
                     {
                         users.map((user, key) => (
-                        <li  key={key} data-username={user} className="list-group-item">{user}</li>
+                            <li  key={key} data-username={user} className="list-group-item">{user}</li>
                         ))
                     }
                 </ul>
