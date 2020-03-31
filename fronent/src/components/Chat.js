@@ -78,12 +78,13 @@ class Chat extends Component {
 
         return (
           <div className="align-self-center w-50 p-3">
+            <div className="card-header">Messages </div>
 
             <ul className="list-group">
                 {
-                    messages.map((message, key) => (
+                    messages.map((message, key) => {
                         <li className="list-group-item d-flex justify-content-between align-items-center" key={key}>{message.from}: {message.body}</li>
-                    ))
+                    })
                 }
             </ul>
             

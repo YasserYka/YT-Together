@@ -34,7 +34,7 @@ class Main extends Component {
 
     render() {
         return (
-          <div className="d-flex justify-content-start mt-5">
+          <div className="d-flex justify-content-start m-5">
               <Watch socket={this.socket} />
               <Chat username={this.state.username} roomId={this.state.roomId} socket={this.socket} />
               <Online roomId={this.state.roomId} socket={this.socket} />
