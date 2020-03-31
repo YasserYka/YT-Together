@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import Chat from './Chat';
 import Watch from './Watch';
+import Online from './Online';
 
 class Main extends Component {
 
@@ -36,6 +37,7 @@ class Main extends Component {
           <div className="d-flex justify-content-start mt-5">
               <Watch socket={this.socket} />
               <Chat username={this.state.username} roomId={this.state.roomId} socket={this.socket} />
+              <Online roomId={this.state.roomId} socket={this.socket} />
           </div>
         )
     }
