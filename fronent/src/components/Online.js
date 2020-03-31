@@ -41,7 +41,9 @@ class Online extends Component {
                 <ul className="list-group">
                     {
                         users.map((user, key) => (
-                            <li  key={key} data-username={user} className="list-group-item">{user}</li>
+                            <div key={key}>
+                                <li data-username={user} className="list-group-item">{user} <span className="badge badge-success ml-3">Active</span></li> 
+                            </div>
                         ))
                     }
                 </ul>

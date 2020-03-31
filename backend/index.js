@@ -76,6 +76,21 @@ const handleRoomEvent = (data, ws) => {
         createRoom(data, ws);
     else if(action === 'join')
         joinRoom(data, ws);
+    else if(action === 'leave')
+        leaveRoom(data, ws)
+}
+
+const leaveRoom = (data, ws) => {
+    let users;
+
+    rooms.forEach(room => {
+        room.users.forEach((user, index, object) => {
+            if(user.ws === ws){
+                users = room.users;
+                object.splice(index, 1);
+            }
+        })
+    })
 }
 
 const notifyRoommates = (data, ws) => {
@@ -92,15 +107,7 @@ const notifyRoommates = (data, ws) => {
         }
     });
 
-    let usernames = [];
 
-    users.forEach(user => usernames.push(user.username));
-
-    ws.send(JSON.stringify({      
-        event: 'online',
-        action: 'alreadyjoined',
-        users: usernames
-    }));
 
 }
 
