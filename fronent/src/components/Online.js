@@ -22,12 +22,14 @@ class Online extends Component {
 
     handleMessage = data => {
         if(data.action === 'joined')
-            this.setState({users: [...this.state.users, data.username,]});
+            this.setState({users: [...this.state.users, data.username]});
         else if(data.action === 'left')
             this.setState(prevState => {
                     users: prevState.users.filter(user => user !== data.username);
                 }
             )
+        else if(data.action === 'alreadyjoined')
+            this.setState({users: this.state.users.concat(data.users)});
     }
 
     render () {

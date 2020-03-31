@@ -79,14 +79,29 @@ const handleRoomEvent = (data, ws) => {
 }
 
 const notifyRoommates = (data, ws) => {
+    let users;
+
     rooms.forEach(room => {
-        if(room.roomId === data.roomId)
+        if(room.roomId === data.roomId){
+            users = room.users;
                 brodcastMessage({      
                     event: 'online',
                     action: 'joined',
                     username: data.username
                 },  room.users, ws);
+        }
     });
+
+    let usernames = [];
+
+    users.forEach(user => usernames.push(user.username));
+
+    ws.send(JSON.stringify({      
+        event: 'online',
+        action: 'alreadyjoined',
+        users: usernames
+    }));
+
 }
 
 const createRoom = (data, ws) => {
