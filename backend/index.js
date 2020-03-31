@@ -40,7 +40,6 @@ const handleMessage = (data, ws) => {
 
 const handleChatEvent = (data, ws) => {
     rooms.forEach(room => {
-        console.log(room.roomId === data.roomId)
         if(room.roomId === data.roomId)
             brodcastMessage(data, room.users, ws);
     });

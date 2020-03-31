@@ -33,10 +33,10 @@ class Main extends Component {
 
     render() {
         return (
-            <React.Fragment>
-                <Watch socket={this.socket} />
-                <Chat username={this.state.username} roomId={this.state.roomId} socket={this.socket} />
-            </React.Fragment>
+          <div className="d-flex justify-content-start mt-5">
+              <Watch socket={this.socket} />
+              <Chat username={this.state.username} roomId={this.state.roomId} socket={this.socket} />
+          </div>
         )
     }
 } 

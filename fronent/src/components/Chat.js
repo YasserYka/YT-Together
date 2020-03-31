@@ -8,7 +8,7 @@ class Chat extends Component {
         this.state = { 
             roomId: this.props.roomId,
             inputMessage: '',
-            messages: []
+            messages: [],
         }
 
         this.handleMessage = this.handleMessage.bind(this);
@@ -27,9 +27,7 @@ class Chat extends Component {
     }
 
     handleMessage = data => {
-        this.setState({
-            messages: [...this.state.messages, {from: data.from, body: data.body}]
-        });
+        this.AppendMessage(data.from, data.body);
     }
 
     handleOnChange = event => {
@@ -41,6 +39,13 @@ class Chat extends Component {
         });
     }
 
+    AppendMessage = (from, body) => {
+        this.setState({
+            messages: [{from: from, body: body}, ...this.state.messages]
+        });
+
+    }
+
     sendMessage = message => {
        this.props.socket.send(JSON.stringify(message)); 
     }
@@ -49,14 +54,22 @@ class Chat extends Component {
         if(event)
             event.preventDefault();
 
+        let inputMessage = this.state.inputMessage;
+        
+        this.AppendMessage('You', inputMessage);
+
         this.sendMessage({
                 event: "chat",
                 action: "brodcast",
                 roomId: this.state.roomId,
-                body: this.state.inputMessage,
+                body: inputMessage,
                 from: this.props.username
             }
         );
+
+        this.setState({
+            inputMessage: ''
+        })
     }
 
     render () {
@@ -64,21 +77,23 @@ class Chat extends Component {
         const { messages } = this.state;
 
         return (
-          <React.Fragment>
-            {
-                messages.map((message, key) => (
-                        <div key={key}>
-                            <span>FROM {message.from} :</span>
-                            <span>{message.body}</span>
-                        </div>
-                    )
-                )
-            }
-            <form onSubmit={this.handleOnSubmit}>
-                <input placeholder="Enter a message" onChange={this.handleOnChange} value={this.state.inputMessage} />
-                <button type="submit">Send</button>
+          <div className="align-self-center w-50 p-3">
+
+            <ul className="list-group">
+                {
+                    messages.map((message, key) => (
+                        <li className="list-group-item d-flex justify-content-between align-items-center" key={key}>{message.from}: {message.body}</li>
+                    ))
+                }
+            </ul>
+            
+            <form className="form-inline mt-4" onSubmit={this.handleOnSubmit} >
+                <div className="form-group mx-sm-3 mb-2">
+                    <input className="form-control" placeholder="Enter a message" onChange={this.handleOnChange} value={this.state.inputMessage} />
+                </div>
+                <button className="btn btn-primary mb-2" type="submit">Send</button>
             </form>
-          </React.Fragment>
+          </div>
         )
     }
 }
