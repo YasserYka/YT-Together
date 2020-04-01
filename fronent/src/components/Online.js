@@ -10,6 +10,7 @@ class Online extends Component {
             users: [],
         }
 
+        this.giveControl = this.giveControl.bind(this);
     }
 
     componentDidMount(){
@@ -19,10 +20,6 @@ class Online extends Component {
                 this.handleMessage(data);
         });
     }
-
-    setHaveControll = bool => {
-        this.haveControll = bool;
-      }
 
     handleMessage = data => {
         if(data.action === 'joined')
@@ -37,6 +34,21 @@ class Online extends Component {
             this.setState({users: this.state.users.concat(data.users)});
     }
 
+    giveControl = event => {
+        if(event)
+            event.preventDefault();
+
+        if(this.props.haveControll){
+            this.props.socket.send(JSON.stringify({
+                event: 'control',
+                action: 'assign',
+                roomId: this.props.roomId,
+                toUsername: event.target.dataset.username,
+                username: this.props.username
+            }))
+        }
+    }
+
     render () {
 
         const { users } = this.state;
@@ -47,7 +59,7 @@ class Online extends Component {
                     {
                         users.map((user, key) => (
                             <div key={key}>
-                                <li data-username={user.username} className="list-group-item">{user.username} <span className="badge badge-success ml-3">{user.haveControll ? "Controller" : "Active"}</span></li> 
+                                <li onClick={this.giveControl} data-username={user.username} className="list-group-item">{user.username} <span className="badge badge-success ml-3">{user.haveControll ? "Controller" : "Active"}</span></li> 
                             </div>
                         ))
                     }

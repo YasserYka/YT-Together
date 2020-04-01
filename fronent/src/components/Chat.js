@@ -87,7 +87,7 @@ class Chat extends Component {
                 }
             </ul>
             
-            <form className="form-inline mt-4" onSubmit={this.handleOnSubmit} >
+            <form className="form-inline mt-4 w-100" onSubmit={this.handleOnSubmit} >
                 <div className="form-group mx-sm-3 mb-2">
                     <input className="form-control" placeholder="Enter a message" onChange={this.handleOnChange} value={this.state.inputMessage} required />
                 </div>

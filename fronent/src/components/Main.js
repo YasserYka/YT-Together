@@ -42,7 +42,7 @@ class Main extends Component {
             let data = JSON.parse(event.data);
             console.log(data)
             if(data.event === 'control')
-              this.setHaveControll(data.youHaveControll)
+              this.setHaveControll(data.youHaveControl)
           }
         );
 
@@ -68,7 +68,7 @@ class Main extends Component {
             <div className="d-flex justify-content-start m-5">
                 <Watch haveControll={this.state.haveControll} socket={this.socket} />
                 <Chat username={this.state.username} roomId={this.state.roomId} socket={this.socket} />
-                <Online haveControll={this.state.haveControll} roomId={this.state.roomId} socket={this.socket} />
+                <Online username={this.state.username} haveControll={this.state.haveControll} roomId={this.state.roomId} socket={this.socket} />
             </div>
 
             <Link to="/" onClick={this.leaveRoom}>

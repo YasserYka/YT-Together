@@ -107,7 +107,6 @@ class Watch extends Component {
   handleOnVideoIdSubmit = event => {
     if(event)
       event.preventDefault();
-    console.log(this.props.haveControll)
     if(this.props.haveControll)
         this.player.loadVideoById(this.state.inputVideoId);
   }
