@@ -9,8 +9,6 @@ class Watch extends Component {
       videoId: '00vnln25HBg',
     }
 
-    this.youHaveControll = false;
-
     this.pauseVideo = this.pauseVideo.bind(this);
     this.seekTo = this.seekTo.bind(this);
     this.playVideo = this.playVideo.bind(this);
@@ -20,7 +18,6 @@ class Watch extends Component {
     this.currentStatus = this.currentStatus.bind(this);
     this.changeVideo = this.changeVideo.bind(this);
     this.updateVideo = this.updateVideo.bind(this);
-    this.haveControll = this.haveControll.bind(this);
     this.syncPause = this.syncPause.bind(this);
   }
 
@@ -29,9 +26,7 @@ class Watch extends Component {
     this.props.socket.addEventListener('message', event => {
       let data = JSON.parse(event.data);
       console.log(data)
-      if(data.event === 'control')
-        this.haveControll(data)
-      else if(data.event === 'sync')
+      if(data.event === 'sync')
         this.updateVideo(data);
     });
 
@@ -100,15 +95,14 @@ class Watch extends Component {
   );
 
   changeState = triggered => {
-    if(this.youHaveControll){
+    console.log(this.props.haveControll)
+    if(this.props.haveControll){
       if(triggered === 1)
         this.sync();
       else if(triggered === 2)
         this.syncPause();
     }
   }
-
-  haveControll = data => this.youHaveControll = data.youHaveControll;
 
   render () {
       return (

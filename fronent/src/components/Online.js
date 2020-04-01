@@ -10,7 +10,6 @@ class Online extends Component {
             users: [],
         }
 
-        this.youHaveControll = false;
     }
 
     componentDidMount(){
@@ -19,10 +18,12 @@ class Online extends Component {
             console.log(data);
             if(data.event === 'online')
                 this.handleMessage(data);
-            else if(data.event === 'control')
-                this.haveControll(data)
         });
     }
+
+    setHaveControll = bool => {
+        this.haveControll = bool;
+      }
 
     handleMessage = data => {
         if(data.action === 'joined')
@@ -47,7 +48,7 @@ class Online extends Component {
                     {
                         users.map((user, key) => (
                             <div key={key}>
-                                <li data-username={user} className="list-group-item">{user} <span className="badge badge-success ml-3">Active</span></li> 
+                                <li data-username={user} className="list-group-item">{user} <span className="badge badge-success ml-3">{user.haveControll ? "Controller" : "Active"}</span></li> 
                             </div>
                         ))
                     }

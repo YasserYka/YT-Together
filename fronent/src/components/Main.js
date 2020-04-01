@@ -7,13 +7,24 @@ import Online from './Online';
 
 class Main extends Component {
 
-    state = {
-        url: "ws://localhost:8080",
-        roomId: this.props.location.state.roomId,
-        username: this.props.location.state.username
+  constructor(props){
+    super(props);
+
+    this.state = {
+      url: "ws://localhost:8080",
+      roomId: this.props.location.state.roomId,
+      username: this.props.location.state.username,
+      haveControll: false
     }
 
-    socket = new WebSocket(this.state.url);
+    this.socket = new WebSocket(this.state.url);
+  }
+
+
+
+    setHaveControll = bool => {
+      this.setState({haveControll: bool});
+    }
     
     componentDidMount(){
       this.socket.onopen = () => {
@@ -24,8 +35,17 @@ class Main extends Component {
                 action: this.props.location.state.action,
                 username: this.state.username,
                 roomId: this.state.roomId
-            })
-          );
+          })
+        );
+        
+        this.socket.addEventListener('message', event => {
+            let data = JSON.parse(event.data);
+            console.log(data)
+            if(data.event === 'control')
+              this.setHaveControll(data.youHaveControll)
+          }
+        );
+
       }
 
       this.socket.onclose = () => {
@@ -46,14 +66,14 @@ class Main extends Component {
         return (
           <React.Fragment>
             <div className="d-flex justify-content-start m-5">
-                <Watch socket={this.socket} />
+                <Watch haveControll={this.state.haveControll} socket={this.socket} />
                 <Chat username={this.state.username} roomId={this.state.roomId} socket={this.socket} />
-                <Online roomId={this.state.roomId} socket={this.socket} />
+                <Online haveControll={this.state.haveControll} roomId={this.state.roomId} socket={this.socket} />
             </div>
 
             <Link to="/" onClick={this.leaveRoom}>
               <button className="btn btn-primary btn-lg mx-auto d-block">
-                Go Home
+                Leave Room
               </button>
             </Link>
           </React.Fragment>
