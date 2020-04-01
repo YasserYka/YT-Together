@@ -53,11 +53,11 @@ const handleSyncEvent = (data, ws) => {
         });
     });
 }
-
 const joinRoom = (data, ws) => {
-    let roomNotFound = true, statusResponse;
+    let roomNotFound = true, users;
     rooms.forEach(room => {
         if(room.roomId === data.roomId){
+            users = room.users;
             roomNotFound = false;
             room.users.push({username: data.username, ws: ws});
         }
@@ -66,7 +66,29 @@ const joinRoom = (data, ws) => {
     if(roomNotFound)
         createRoom(data, ws);
     else
-        notifyRoommates(data, ws);
+        notifyUsers(data, ws, users);
+
+}
+const notifyUsers = (data, ws, users) => {
+
+    brodcastMessage({      
+        event: 'online',
+        action: 'joined',
+        username: data.username
+    },  users, ws)
+
+    let usernames = [];
+
+    users.forEach(user => {
+        if(user.ws != ws)
+            usernames.push(user.username);
+    });
+
+    ws.send(JSON.stringify({      
+        event: 'online',
+        action: 'alreadyjoined',
+        users: usernames
+    }));
 
 }
 
@@ -89,26 +111,14 @@ const leaveRoom = (data, ws) => {
                 users = room.users;
                 object.splice(index, 1);
             }
+            else
+                brodcastMessage({
+                    event: 'online',
+                    action: 'left',
+                    username: data.username
+                }, room.users, ws);
         })
     })
-}
-
-const notifyRoommates = (data, ws) => {
-    let users;
-
-    rooms.forEach(room => {
-        if(room.roomId === data.roomId){
-            users = room.users;
-                brodcastMessage({      
-                    event: 'online',
-                    action: 'joined',
-                    username: data.username
-                },  room.users, ws);
-        }
-    });
-
-
-
 }
 
 const createRoom = (data, ws) => {

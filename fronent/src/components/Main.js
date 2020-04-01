@@ -36,7 +36,9 @@ class Main extends Component {
     leaveRoom = () => {
       this.socket.send(JSON.stringify({
         event: 'room',
-        action: 'leave'
+        action: 'leave',
+        roomId: this.state.roomId,
+        username: this.state.username
       }));
     }
 

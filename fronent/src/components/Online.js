@@ -9,6 +9,8 @@ class Online extends Component {
             roomId: this.props.roomId,
             users: [],
         }
+
+        this.youHaveControll = false;
     }
 
     componentDidMount(){
@@ -17,17 +19,20 @@ class Online extends Component {
             console.log(data);
             if(data.event === 'online')
                 this.handleMessage(data);
+            else if(data.event === 'control')
+                this.haveControll(data)
         });
     }
 
     handleMessage = data => {
         if(data.action === 'joined')
             this.setState({users: [...this.state.users, data.username]});
-        else if(data.action === 'left')
-            this.setState(prevState => {
-                    users: prevState.users.filter(user => user !== data.username);
-                }
+        else if(data.action === 'left'){
+            this.setState(prevState => ({
+                    users: prevState.users.filter(user => user !== data.username)
+                })
             )
+        }
         else if(data.action === 'alreadyjoined')
             this.setState({users: this.state.users.concat(data.users)});
     }
@@ -37,7 +42,7 @@ class Online extends Component {
         const { users } = this.state;
         return (
             <div className="align-self-center w-50 p-3">
-                <div className="card-header">Online Users </div>
+                <div className="card-header">Online Users</div>
                 <ul className="list-group">
                     {
                         users.map((user, key) => (

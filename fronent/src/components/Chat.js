@@ -77,7 +77,7 @@ class Chat extends Component {
         const { messages } = this.state;
 
         return (
-          <div className="align-self-center w-50 p-3">
+          <div className="w-50 h-100 p-3">
             <div className="card-header">Messages </div>
 
             <ul className="list-group">
@@ -92,7 +92,7 @@ class Chat extends Component {
                 <div className="form-group mx-sm-3 mb-2">
                     <input className="form-control" placeholder="Enter a message" onChange={this.handleOnChange} value={this.state.inputMessage} />
                 </div>
-                <button className="btn btn-primary mb-2" type="submit">Send</button>
+                <button className="btn btn-primary mb-2 mx-auto d-block" type="submit">Send</button>
             </form>
           </div>
         )
