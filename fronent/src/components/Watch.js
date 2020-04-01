@@ -7,18 +7,11 @@ class Watch extends Component {
 
     this.state = {
       videoId: '00vnln25HBg',
+      inputVideoId: ''
     }
 
-    this.pauseVideo = this.pauseVideo.bind(this);
-    this.seekTo = this.seekTo.bind(this);
-    this.playVideo = this.playVideo.bind(this);
-    this.onStateChange = this.onStateChange.bind(this);
-    this.changeState = this.changeState.bind(this);
-    this.sync = this.sync.bind(this);
-    this.currentStatus = this.currentStatus.bind(this);
-    this.changeVideo = this.changeVideo.bind(this);
-    this.updateVideo = this.updateVideo.bind(this);
-    this.syncPause = this.syncPause.bind(this);
+    this.handleOnChangeVideoId = this.handleOnChangeVideoId.bind(this);
+    this.handleOnVideoIdSubmit = this.handleOnVideoIdSubmit.bind(this);
   }
 
   componentDidMount(){
@@ -94,7 +87,6 @@ class Watch extends Component {
   );
 
   changeState = triggered => {
-    console.log(this.props.haveControll)
     if(this.props.haveControll){
       if(triggered === 1)
         this.sync();
@@ -103,12 +95,36 @@ class Watch extends Component {
     }
   }
 
+  handleOnChangeVideoId = event => {
+    if(event)
+      event.preventDefault();
+
+    this.setState({
+      inputVideoId: event.target.value
+    });
+  }
+
+  handleOnVideoIdSubmit = event => {
+    if(event)
+      event.preventDefault();
+    console.log(this.props.haveControll)
+    if(this.props.haveControll)
+        this.player.loadVideoById(this.state.inputVideoId);
+  }
+
   render () {
       return (
         <React.Fragment>
           <div className="embed-responsive embed-responsive-16by9">
             <div className="embed-responsive-item" id="player"></div>
           </div>
+
+          <form className="m-3"  onSubmit={this.handleOnVideoIdSubmit}>
+            <div className="form-group">
+              <input placeholder="Video ID" className="form-control" onChange={this.handleOnChangeVideoId} value={this.state.inputVideoId} required />
+            </div>
+            <button className="btn btn-primary mb-2 mx-auto d-block" type="submit">Change Video</button>
+          </form>
         </React.Fragment>
       )
   }
