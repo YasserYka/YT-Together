@@ -7,10 +7,6 @@ let assignControll = true;
 let rooms = []
 
 wss.on('connection', ws => {
-    if(assignControll){
-        ws.send(JSON.stringify({event: 'control', youHaveControll: true}));
-        assignControll = false;
-    }
     ws.on('message', message => {
         console.log(JSON.parse(message));
         handleMessage(JSON.parse(message), ws);
@@ -59,7 +55,7 @@ const joinRoom = (data, ws) => {
         if(room.roomId === data.roomId){
             users = room.users;
             roomNotFound = false;
-            room.users.push({username: data.username, ws: ws});
+            room.users.push({username: data.username, ws: ws, haveControll: false});
         }
     });
     
@@ -74,19 +70,20 @@ const notifyUsers = (data, ws, users) => {
     brodcastMessage({      
         event: 'online',
         action: 'joined',
-        username: data.username
+        users: {username: data.username, haveControll: false}
     },  users, ws)
 
     let usernames = [];
 
     users.forEach(user => {
         if(user.ws != ws)
-            usernames.push(user.username);
+            usernames.push({username: user.username, haveControll: user.haveControll});
     });
 
     ws.send(JSON.stringify({      
         event: 'online',
         action: 'alreadyjoined',
+        haveControll: false,
         users: usernames
     }));
 
@@ -122,7 +119,8 @@ const leaveRoom = (data, ws) => {
 }
 
 const createRoom = (data, ws) => {
-    rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws}]});
+    rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws, haveControll: true}]});
+    ws.send(JSON.stringify({event: 'control', youHaveControll: true}));
 }
 
 const printRooms = () => {

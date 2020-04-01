@@ -15,7 +15,6 @@ class Online extends Component {
     componentDidMount(){
         this.props.socket.addEventListener('message', event => {
             let data = JSON.parse(event.data);
-            console.log(data);
             if(data.event === 'online')
                 this.handleMessage(data);
         });
@@ -27,7 +26,7 @@ class Online extends Component {
 
     handleMessage = data => {
         if(data.action === 'joined')
-            this.setState({users: [...this.state.users, data.username]});
+            this.setState({users: [...this.state.users, data.users]});
         else if(data.action === 'left'){
             this.setState(prevState => ({
                     users: prevState.users.filter(user => user !== data.username)
@@ -48,7 +47,7 @@ class Online extends Component {
                     {
                         users.map((user, key) => (
                             <div key={key}>
-                                <li data-username={user} className="list-group-item">{user} <span className="badge badge-success ml-3">{user.haveControll ? "Controller" : "Active"}</span></li> 
+                                <li data-username={user.username} className="list-group-item">{user.username} <span className="badge badge-success ml-3">{user.haveControll ? "Controller" : "Active"}</span></li> 
                             </div>
                         ))
                     }

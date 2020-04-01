@@ -19,7 +19,6 @@ class Chat extends Component {
     componentDidMount(){
         this.props.socket.addEventListener('message', event => {
             let data = JSON.parse(event.data);
-            console.log(data);
             if(data.event === 'chat')
                 this.handleMessage(data);
         });

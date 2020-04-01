@@ -25,7 +25,6 @@ class Watch extends Component {
 
     this.props.socket.addEventListener('message', event => {
       let data = JSON.parse(event.data);
-      console.log(data)
       if(data.event === 'sync')
         this.updateVideo(data);
     });
