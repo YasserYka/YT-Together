@@ -3,11 +3,9 @@ const wss = new WebSocket({ server: server }), port = process.env.PORT || 8080, 
 server.on('request', app);
 
 let rooms = []
-let usersCount = 1;
 
 wss.on('connection', ws => {
     ws.on('message', message => {
-        ws.id = usersCount++;
         console.log(JSON.parse(message));
         handleMessage(JSON.parse(message), ws);
     });
@@ -17,6 +15,7 @@ server.listen(port, () => {
     console.log(`Listening on ${port}!`);
 });
 
+//Sends Data-Payload to all users in specific room except the sender 
 const brodcastMessage = (data, users, ws) => {
     users.forEach(user => {
         if(user.ws != ws)
@@ -41,36 +40,37 @@ const handleControllerEvent = (data, ws) => {
         assignControllAction(data)
 }
 
-
-//?
 const assignControllAction = (data) => {
-    rooms.forEach(room => {
-        if(room.roomId === data.roomId)
-            room.users.forEach(user => {
-                if(user.username === data.toUsername){
-                    user.haveControl = true;
-                    user.ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: true}));
-                }
-                else if(data.username == user.username){
-                    user.haveControl = false;
-                    user.ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: false}));
-                }
-                user.ws.send(JSON.stringify({
-                    event: 'online',
-                    action: 'newcontroller',
-                    username: data.toUsername
-                }))
-            });
-    })
+    let room = findRoomWithId(data.roomId);
+
+    if(room)
+        room.users.forEach(user => {
+
+            if(user.username === data.toUsername){
+                user.haveControl = true;
+                user.ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: user.haveControl}));
+            }
+            else if(data.username == user.username){
+                user.haveControl = false;
+                user.ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: user.haveControl}));
+            }
+
+            sendMessageToUser({
+                event: 'online',
+                action: 'newcontroller',
+                username: data.toUsername
+            }, ws);
+        });
 }
+
+const sendMessageToUser = (message, ws) => ws.send(JSON.stringify(message));
 
 const findRoomWithId = id => {
     let roomFound;
 
     rooms.forEach(room => {
-        if(room.roomId === id){
+        if(room.roomId === id)
             roomFound = room;
-        }
     });
 
     return roomFound;
@@ -91,15 +91,18 @@ const handleSyncEvent = (data, ws) => {
         });
     });
 }
+
 const joinRoom = (data, ws) => {
     let room = findRoomWithId(data.roomId);
 
     if(room){
         room.users.push({username: data.username, ws: ws, haveControl: false});
-        notifyUsers(data, ws, users);
+        notifyUsers(data, ws, room.users);
     } else
         createRoom(data, ws);
 }
+
+//Notify users if user joined their room
 const notifyUsers = (data, ws, users) => {
 
     brodcastMessage({      
@@ -108,22 +111,19 @@ const notifyUsers = (data, ws, users) => {
         users: {username: data.username, haveControl: false}
     },  users, ws)
 
-    let usernames = [];
+    let usersPyload = [];
 
     users.forEach(user => {
-        if(user.ws != ws){
-            console.log(user.username + " " + user.haveControl)
-            usernames.push({username: user.username, haveControl: user.haveControl});
-        }
+        if(user.ws != ws)
+        usersPyload.push({username: user.username, haveControl: user.haveControl});
     });
 
-    ws.send(JSON.stringify({      
+    sendMessageToUser({      
         event: 'online',
         action: 'alreadyjoined',
         haveControl: false,
-        users: usernames
-    }));
-
+        users: usersPyload
+    }, ws);
 }
 
 const handleRoomEvent = (data, ws) => {
@@ -139,6 +139,7 @@ const handleRoomEvent = (data, ws) => {
 const leaveRoom = (data, ws) => {
     let users;
 
+    //Remove user from it's room and sends notification to others
     rooms.forEach(room => {
         room.users.forEach((user, index, object) => {
             if(user.ws == ws){
