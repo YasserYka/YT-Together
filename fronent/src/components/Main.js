@@ -42,7 +42,7 @@ class Main extends Component {
             let data = JSON.parse(event.data);
             console.log(data)
             if(data.event === 'control')
-              this.setHaveControll(data.youHaveControl)
+              this.handleControlEvent(data)
           }
         );
 
@@ -51,6 +51,12 @@ class Main extends Component {
       this.socket.onclose = () => {
         console.warn('Websocket Disconnected');
       }
+    }
+
+    handleControlEvent = data => { 
+      if(data.action === 'youhavecontrol')  
+        this.setHaveControll(data.youHaveControl)
+
     }
 
     leaveRoom = () => {

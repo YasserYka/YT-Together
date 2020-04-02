@@ -3,9 +3,11 @@ const wss = new WebSocket({ server: server }), port = process.env.PORT || 8080, 
 server.on('request', app);
 
 let rooms = []
+let usersCount = 1;
 
 wss.on('connection', ws => {
     ws.on('message', message => {
+        ws.id = usersCount++;
         console.log(JSON.parse(message));
         handleMessage(JSON.parse(message), ws);
     });
@@ -17,7 +19,7 @@ server.listen(port, () => {
 
 const brodcastMessage = (data, users, ws) => {
     users.forEach(user => {
-        if(user.ws !== ws)
+        if(user.ws != ws)
             user.ws.send(JSON.stringify(data));
     });
 }
@@ -39,27 +41,46 @@ const handleControllerEvent = (data, ws) => {
         assignControllAction(data)
 }
 
+
+//?
 const assignControllAction = (data) => {
     rooms.forEach(room => {
         if(room.roomId === data.roomId)
             room.users.forEach(user => {
                 if(user.username === data.toUsername){
                     user.haveControl = true;
-                    user.ws.send(JSON.stringify({event: 'control', youHaveControl: true}));
+                    user.ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: true}));
                 }
                 else if(data.username == user.username){
                     user.haveControl = false;
-                    user.ws.send(JSON.stringify({event: 'control', youHaveControl: false}));
+                    user.ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: false}));
                 }
+                user.ws.send(JSON.stringify({
+                    event: 'online',
+                    action: 'newcontroller',
+                    username: data.toUsername
+                }))
             });
     })
 }
 
-const handleChatEvent = (data, ws) => {
+const findRoomWithId = id => {
+    let roomFound;
+
     rooms.forEach(room => {
-        if(room.roomId === data.roomId)
-            brodcastMessage(data, room.users, ws);
+        if(room.roomId === id){
+            roomFound = room;
+        }
     });
+
+    return roomFound;
+}
+
+const handleChatEvent = (data, ws) => {
+    let room = findRoomWithId(data.roomId);
+
+    if(room)
+        brodcastMessage(data, room.users, ws);
 }
 
 const handleSyncEvent = (data, ws) => {
@@ -71,20 +92,13 @@ const handleSyncEvent = (data, ws) => {
     });
 }
 const joinRoom = (data, ws) => {
-    let roomNotFound = true, users;
-    rooms.forEach(room => {
-        if(room.roomId === data.roomId){
-            users = room.users;
-            roomNotFound = false;
-            room.users.push({username: data.username, ws: ws, haveControl: false});
-        }
-    });
-    
-    if(roomNotFound)
-        createRoom(data, ws);
-    else
-        notifyUsers(data, ws, users);
+    let room = findRoomWithId(data.roomId);
 
+    if(room){
+        room.users.push({username: data.username, ws: ws, haveControl: false});
+        notifyUsers(data, ws, users);
+    } else
+        createRoom(data, ws);
 }
 const notifyUsers = (data, ws, users) => {
 
@@ -97,8 +111,10 @@ const notifyUsers = (data, ws, users) => {
     let usernames = [];
 
     users.forEach(user => {
-        if(user.ws != ws)
+        if(user.ws != ws){
+            console.log(user.username + " " + user.haveControl)
             usernames.push({username: user.username, haveControl: user.haveControl});
+        }
     });
 
     ws.send(JSON.stringify({      
@@ -111,15 +127,6 @@ const notifyUsers = (data, ws, users) => {
 }
 
 const handleRoomEvent = (data, ws) => {
-
-    //To make sure user not already registered
-    rooms.forEach(room => {
-        room.users.forEach((user, index) => {
-            if(user.ws === ws)
-                return;
-        })
-    })
-
     let action = data.action;
     if(action === 'create')
         createRoom(data, ws);
@@ -134,7 +141,7 @@ const leaveRoom = (data, ws) => {
 
     rooms.forEach(room => {
         room.users.forEach((user, index, object) => {
-            if(user.ws === ws){
+            if(user.ws == ws){
                 users = room.users;
                 object.splice(index, 1);
             }
@@ -150,11 +157,5 @@ const leaveRoom = (data, ws) => {
 
 const createRoom = (data, ws) => {
     rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws, haveControl: true}]});
-    ws.send(JSON.stringify({event: 'control', youHaveControl: true}));
-}
-
-const printRooms = () => {
-    rooms.forEach(room => {
-        console.log(room.roomId, room.users)
-    }); 
+    ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: true}));
 }
