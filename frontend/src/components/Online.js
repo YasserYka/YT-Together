@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 
 class Online extends Component {
 
     constructor(props){
         super(props);
         this.state = { 
-            roomId: this.props.roomId,
-            users: [],
+            users: []
         }
 
         this.giveControl = this.giveControl.bind(this);
@@ -21,17 +21,27 @@ class Online extends Component {
     }
 
     handleMessage = data => {
-        if(data.action === 'joined')
+        if(data.action === 'join')
             this.setState({users: [...this.state.users, data.users]});
-        else if(data.action === 'left')
-            this.handleLeftAction(data);
-        else if(data.action === 'alreadyjoined')
+        else if(data.action === 'leave')
+            this.handleLeaveAction(data);
+        else if(data.action === 'onlineuserslist')
             this.setState({users: this.state.users.concat(data.users)});
         else if(data.action === 'newcontroller')
             this.newControllerAction(data);
     }
 
-    handleLeftAction = data => {
+    leaveRoom = () => {
+        this.props.socket.send(JSON.stringify({
+          event: 'room',
+          action: 'leave',
+          roomId: this.props.roomId,
+          username: this.props.username
+        }));
+      }
+
+    handleLeaveAction = data => {
+        console.log(data)
         this.setState({users: this.state.users.filter(user => user.username !== data.username)});
     }
 
@@ -40,9 +50,9 @@ class Online extends Component {
 
         newUsers.forEach(user => {
             if(data.username === user.username)
-                user.haveControl = true;
-            else if(user.haveControl === true)
-                user.haveControl = false;
+                user.controller = true;
+            else if(user.controller === true)
+                user.controller = false;
         })
 
         this.setState({
@@ -54,7 +64,7 @@ class Online extends Component {
         if(event)
             event.preventDefault();
 
-        if(this.props.haveControll){
+        if(this.props.controllrt){
             this.props.socket.send(JSON.stringify({
                 event: 'control',
                 action: 'assign',
@@ -69,7 +79,7 @@ class Online extends Component {
 
         const { users } = this.state;
         return (
-            <div className="w-50 p-3">
+            <div className="w-50 p-3 ">
                 <div className="card-header text-center"> Online <i class="fa fa-users" aria-hidden="true"></i> </div>
                 <ul className="list-group">
                     {
@@ -80,6 +90,13 @@ class Online extends Component {
                         ))
                     }
                 </ul>
+                <div class="mt-5 col text-center">
+                    <Link to="/" onClick={this.leaveRoom}>
+                        <button className="btn btn-lg">
+                            Leave Room
+                        </button>
+                    </Link>
+                </div>
             </div>
         )
     }

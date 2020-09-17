@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from "react-router-dom";
 
 class Watch extends Component {
 
@@ -88,7 +87,8 @@ class Watch extends Component {
   );
 
   changeState = triggered => {
-    if(this.props.haveControll){
+    console.log(this.props.controller)
+    if(this.props.controller){
       if(triggered === 1)
         this.sync();
       else if(triggered === 2)
@@ -108,7 +108,7 @@ class Watch extends Component {
   handleOnVideoIdSubmit = event => {
     if(event)
       event.preventDefault();
-    if(this.props.haveControll)
+    if(this.props.controller)
         this.player.loadVideoById(this.state.inputVideoId);
   }
 
@@ -123,13 +123,6 @@ class Watch extends Component {
             <div className="form-group col">
               <input placeholder="Video ID" className="form-control mb-3 " onChange={this.handleOnChangeVideoId} value={this.state.inputVideoId} required />
               <button className="btn mb-2 mx-auto d-block" type="submit">Change Video</button>
-            </div>
-            <div class="col text-center">
-              <Link to="/" onClick={this.leaveRoom}>
-                <button className="btn btn-lg">
-                  Leave Room
-                </button>
-              </Link>
             </div>
           </form>
           

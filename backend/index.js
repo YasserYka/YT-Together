@@ -23,7 +23,7 @@ const handleMessage = (data, ws) => {
     let event = data.event;
     if(event === EVENTS.ROOM)
         handleRoomEvent(data, ws);
-    else if(event === 'sync')
+    else if(event === EVENTS.SYNCHRONIZE)
         handleSyncEvent(data, ws);
     else if(event === 'chat')
         handleChatEvent(data, ws);
@@ -43,12 +43,12 @@ const assignControllAction = (data) => {
         room.users.forEach(user => {
 
             if(user.username === data.toUsername){
-                user.haveControl = true;
-                user.ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: user.haveControl}));
+                user.controller = true;
+                user.ws.send(JSON.stringify({event: 'control', controller: user.controller}));
             }
             else if(data.username == user.username){
-                user.haveControl = false;
-                user.ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: user.haveControl}));
+                user.controller = false;
+                user.ws.send(JSON.stringify({event: 'control', controller: user.controller}));
             }
 
             sendMessageToUser({
@@ -158,7 +158,7 @@ const leaveRoom = (data, ws) => {
             }
         });
     });
-    
+
 }
 
 server.listen(port, () => {
