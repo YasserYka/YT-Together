@@ -2,7 +2,9 @@ const WebSocket = require('ws').Server, server  = require('http').createServer()
 const wss = new WebSocket({ server: server }), port = process.env.PORT || 8080, app = require('./http-server');
 server.on('request', app);
 
-let rooms = []
+let rooms = [];
+
+setInterval(()=>{console.log(rooms.length)}, 10000)
 
 wss.on('connection', ws => {
     ws.on('message', message => {
@@ -25,14 +27,14 @@ const handleMessage = (data, ws) => {
         handleRoomEvent(data, ws);
     else if(event === EVENTS.SYNCHRONIZE)
         handleSyncEvent(data, ws);
-    else if(event === 'chat')
+    else if(event === EVENTS.CHAT)
         handleChatEvent(data, ws);
-    else if(event === 'control')
+    else if(event === EVENTS.VIDEO_CONTROLLER)
         handleControllerEvent(data, ws);
 }
 
-const handleControllerEvent = (data, ws) => {
-    if(data.action === 'assign')
+const handleControllerEvent = data => {
+    if(data.action === ACTIONS.ASSIGN)
         assignControllAction(data)
 }
 
@@ -44,18 +46,18 @@ const assignControllAction = (data) => {
 
             if(user.username === data.toUsername){
                 user.controller = true;
-                user.ws.send(JSON.stringify({event: 'control', controller: user.controller}));
+                sendMessageToUser({event: EVENTS.VIDEO_CONTROLLER, action: ACTIONS.CONTROLLER}, user.ws);
             }
-            else if(data.username == user.username){
+            else if(user.username === data.username){
                 user.controller = false;
-                user.ws.send(JSON.stringify({event: 'control', controller: user.controller}));
+                sendMessageToUser({event: EVENTS.VIDEO_CONTROLLER, action: ACTIONS.GUEST}, user.ws); 
             }
 
             sendMessageToUser({
-                event: 'online',
-                action: 'newcontroller',
+                event: EVENTS.ONLINE,
+                action: ACTIONS.NEW_CONTROLLER,
                 username: data.toUsername
-            }, ws);
+            }, user.ws);
         });
 }
 
@@ -67,15 +69,12 @@ const findRoomWithId = id => {
     let roomFound;
 
     rooms.forEach(room => {
-        if(room.roomId === id){
+        if(room.roomId === id)
             roomFound = room;
-
-        }
     });
 
     return roomFound;
 }
-
 
 const handleChatEvent = (data, ws) => {
     let room = findRoomWithId(data.roomId);
@@ -85,12 +84,10 @@ const handleChatEvent = (data, ws) => {
 }
 
 const handleSyncEvent = (data, ws) => {
-    rooms.forEach(room => {
-        room.users.forEach(user => {
-            if(user.ws == ws)
-                brodcastMessage(data, room.users, ws);
-        });
-    });
+    let room = findRoomWithId(data.roomId);
+
+    if(room)
+        brodcastMessage(data, room.users, ws);
 }
 
 const handleJoinedUser = (data, ws, users) => {
@@ -123,13 +120,13 @@ const handleRoomEvent = (data, ws) => {
         createRoom(data, ws);
     else if(action === ACTIONS.JOIN)
         joinRoom(data, ws);
-    else if(action === 'leave')
+    else if(action === ACTIONS.LEAVE)
         leaveRoom(data, ws)
 }
 
 const createRoom = (data, ws) => {
     rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws, controller: true}]});
-    ws.send(JSON.stringify({event: 'control', action: ACTIONS.CONTROLLER}));
+    ws.send(JSON.stringify({event: EVENTS.VIDEO_CONTROLLER, action: ACTIONS.CONTROLLER}));
 }
 
 const joinRoom = (data, ws) => {
@@ -145,15 +142,27 @@ const joinRoom = (data, ws) => {
 const leaveRoom = (data, ws) => {
 
     // remove user from it's room and sends notification to others
-    rooms.forEach(room => {
-        room.users.forEach((user, index, object) => {
+    rooms.forEach((room, roomIndex, roomObject) => {
+        room.users.forEach((user, userIndex, userObject) => {
             if(user.ws == ws){
-                object.splice(index, 1);
+                userObject.splice(userIndex, 1);
 
+                if (userObject.length == 0)
+                    roomObject.splice(roomIndex, 1);
+                else if(user.controller){
+                    room.users[0].controller = true;
+                    sendMessageToUser({event: EVENTS.VIDEO_CONTROLLER, action: ACTIONS.CONTROLLER}, room.users[0].ws);
+                }
                 brodcastMessage({
                     event: EVENTS.ONLINE,
                     action: ACTIONS.LEAVE,
-                    username: data.username
+                    username: user.username
+                }, room.users, ws);
+
+                brodcastMessage({
+                    event: EVENTS.ONLINE,
+                    action: ACTIONS.NEW_CONTROLLER,
+                    username: room.users[0].username
                 }, room.users, ws);
             }
         });

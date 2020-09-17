@@ -4,5 +4,7 @@ module.exports = Object.freeze({
     LEAVE: 'leave',
     CONTROLLER: 'controller',
     GUEST: 'guest',
-    ONLINE_USERS_LIST: 'onlineuserslist'
+    ONLINE_USERS_LIST: 'onlineuserslist',
+    ASSIGN: 'assign',
+    NEW_CONTROLLER: 'newcontroller'
 });

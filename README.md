@@ -1,6 +1,8 @@
 # YT-API
 This is a simple web application that allow mutiple clients to watch the same (synchronized) Youtube's videos and chat in the same time
 
+![Getting Started](ss.png)
+
 # Technology used
 - YouTube Player API 
 - React
