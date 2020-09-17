@@ -3,12 +3,7 @@ import { Redirect } from "react-router-dom";
 
 class Index extends Component {
 
-   state = {
-    action: 'create',
-            username: 'null',
-            roomId: 'null',
-            redirect: false
-    }
+   state = { action: 'create', username: 'null', roomId: 'null', redirect: false }
 
 
     submitHandler = event => {

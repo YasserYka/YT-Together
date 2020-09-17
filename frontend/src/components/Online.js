@@ -4,7 +4,6 @@ class Online extends Component {
 
     constructor(props){
         super(props);
-
         this.state = { 
             roomId: this.props.roomId,
             users: [],
@@ -32,7 +31,9 @@ class Online extends Component {
             this.newControllerAction(data);
     }
 
-    handleLeftAction = data => this.setState({users: this.state.users.filter(user => user.username !== data.username)});
+    handleLeftAction = data => {
+        this.setState({users: this.state.users.filter(user => user.username !== data.username)});
+    }
 
     newControllerAction = data => {
         let newUsers = this.state.users;
@@ -74,7 +75,7 @@ class Online extends Component {
                     {
                         users.map((user, key) => (
                             <div key={key}>
-                                <li onClick={this.giveControl} data-username={user.username} className="list-group-item">{user.username} <span className="badge badge-success ml-3">{user.haveControl ? "Controller" : "Active"}</span></li> 
+                                <li onClick={this.giveControl} data-username={user.username} className="list-group-item">{user.username} <span className="badge badge-success ml-3">{user.controller ? "Controller" : "Active"}</span></li> 
                             </div>
                         ))
                     }

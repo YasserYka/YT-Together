@@ -1,4 +1,4 @@
-const WebSocket = require('ws').Server, server  = require('http').createServer();
+const WebSocket = require('ws').Server, server  = require('http').createServer(), ACTIONS = require('./actions') ,EVENTS = require('./events');
 const wss = new WebSocket({ server: server }), port = process.env.PORT || 8080, app = require('./http-server');
 server.on('request', app);
 
@@ -21,7 +21,7 @@ const brodcastMessage = (data, users, ws) => {
 
 const handleMessage = (data, ws) => {
     let event = data.event;
-    if(event === 'room')
+    if(event === EVENTS.ROOM)
         handleRoomEvent(data, ws);
     else if(event === 'sync')
         handleSyncEvent(data, ws);
@@ -67,12 +67,15 @@ const findRoomWithId = id => {
     let roomFound;
 
     rooms.forEach(room => {
-        if(room.roomId === id)
+        if(room.roomId === id){
             roomFound = room;
+
+        }
     });
 
     return roomFound;
 }
+
 
 const handleChatEvent = (data, ws) => {
     let room = findRoomWithId(data.roomId);
@@ -90,75 +93,73 @@ const handleSyncEvent = (data, ws) => {
     });
 }
 
-const joinRoom = (data, ws) => {
-    let room = findRoomWithId(data.roomId);
+const handleJoinedUser = (data, ws, users) => {
 
-    if(room){
-        room.users.push({username: data.username, ws: ws, haveControl: false});
-        notifyUsers(data, ws, room.users);
-    } else
-        createRoom(data, ws);
-}
-
-//Notify users if user joined their room
-const notifyUsers = (data, ws, users) => {
-
+    // send controller to all users already in the room about the new joined user
     brodcastMessage({      
-        event: 'online',
-        action: 'joined',
-        users: {username: data.username, haveControl: false}
+        event: EVENTS.ONLINE,
+        action: ACTIONS.JOIN,
+        users: {username: data.username, controller: false}
     },  users, ws)
 
-    let usersPyload = [];
+    let online_users_list = [];
 
     users.forEach(user => {
         if(user.ws != ws)
-        usersPyload.push({username: user.username, haveControl: user.haveControl});
+            online_users_list.push({username: user.username, controller: user.controller});
     });
 
+    // send list of users already in the room to the new user
     sendMessageToUser({      
-        event: 'online',
-        action: 'alreadyjoined',
-        haveControl: false,
-        users: usersPyload
+        event: EVENTS.ONLINE,
+        action: ACTIONS.ONLINE_USERS_LIST,
+        users: online_users_list
     }, ws);
 }
 
 const handleRoomEvent = (data, ws) => {
     let action = data.action;
-    if(action === 'create')
+    if(action === ACTIONS.CREATE)
         createRoom(data, ws);
-    else if(action === 'join')
+    else if(action === ACTIONS.JOIN)
         joinRoom(data, ws);
     else if(action === 'leave')
         leaveRoom(data, ws)
 }
 
-const leaveRoom = (data, ws) => {
-    let users;
+const createRoom = (data, ws) => {
+    rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws, controller: true}]});
+    ws.send(JSON.stringify({event: 'control', action: ACTIONS.CONTROLLER}));
+}
 
-    //Remove user from it's room and sends notification to others
+const joinRoom = (data, ws) => {
+    let room = findRoomWithId(data.roomId);
+
+    if(room){
+        room.users.push({username: data.username, ws: ws, controller: false});
+        handleJoinedUser(data, ws, room.users);
+    } else
+        createRoom(data, ws);
+}
+
+const leaveRoom = (data, ws) => {
+
+    // remove user from it's room and sends notification to others
     rooms.forEach(room => {
         room.users.forEach((user, index, object) => {
             if(user.ws == ws){
-                users = room.users;
                 object.splice(index, 1);
-            }
-            else
+
                 brodcastMessage({
-                    event: 'online',
-                    action: 'left',
+                    event: EVENTS.ONLINE,
+                    action: ACTIONS.LEAVE,
                     username: data.username
                 }, room.users, ws);
-        })
-    })
+            }
+        });
+    });
+    
 }
-
-const createRoom = (data, ws) => {
-    rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws, haveControl: true}]});
-    ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: true}));
-}
-
 
 server.listen(port, () => {
     console.log(`Listening on ${port}!`);
