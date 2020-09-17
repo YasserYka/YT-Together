@@ -41,26 +41,25 @@ class Index extends Component {
         }
 
         return (
-            <div className="col-sm-12 my-auto">
-                <div className="container mt-5">
-                    <form onSubmit={this.submitHandler}>
-                        <div className="form-group">
-                            <input className="form-control" type="text" ref="username" placeholder="You Username" required />
-                        </div>
-                        <div className="form-group">
-                            <input  className="form-control" type="text" ref="roomId" placeholder="Room Id" required />
+            <div class="wrapper fadeInDown">
+                <div id="formContent">
+
+                    <div class="fadeIn first">
+                        <img src="/icon.png" id="icon" alt="User Icon" />
+                    </div>
+
+                    <form>
+                        <input type="text" ref="username" placeholder="You Username" class="fadeIn second" required />
+                        <input type="text" ref="roomId" placeholder="Room Id" class="fadeIn third" required />
+                        <div className="custom-control custom-radio custom-control-inline">
+                            <input value="join" type="radio" id="customRadioInline2" name="customRadioInline1" className="custom-control-input" onChange={this.radioButtonHandler} />
+                            <label className="custom-control-label" htmlFor="customRadioInline2">Join Room</label>
                         </div>
                         <div className="custom-control custom-radio custom-control-inline">
                             <input value="create" type="radio" id="customRadioInline1" name="customRadioInline1" className="custom-control-input" onChange={this.radioButtonHandler} />
                             <label className="custom-control-label" htmlFor="customRadioInline1">Create Room</label>
                         </div>
-                        <div className="custom-control custom-radio custom-control-inline">
-                            <input value="join" type="radio" id="customRadioInline2" name="customRadioInline1" className="custom-control-input" onChange={this.radioButtonHandler} />
-                            <label className="custom-control-label" htmlFor="customRadioInline2">Join Room</label>
-                        </div>
-                        <div className="form-group">
-                            <input className="form-control btn btn-info btn-lg btn-block mt-3" type="submit" value="Submit" />
-                        </div>
+                        <input type="submit" value="Submit" class="fadeIn fourth" />
                     </form>
                 </div>
             </div>

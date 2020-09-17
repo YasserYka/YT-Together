@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from "react-router-dom";
 
 import Chat from './Chat';
 import Watch from './Watch';
@@ -19,8 +18,6 @@ class Main extends Component {
 
     this.socket = new WebSocket(this.state.url);
   }
-
-
 
     setHaveControll = bool => {
       this.setState({haveControll: bool});
@@ -72,16 +69,10 @@ class Main extends Component {
         return (
           <React.Fragment>
             <div className="d-flex justify-content-start m-5">
-                <Watch haveControll={this.state.haveControll} socket={this.socket} />
                 <Chat username={this.state.username} roomId={this.state.roomId} socket={this.socket} />
+                <Watch haveControll={this.state.haveControll} socket={this.socket} />
                 <Online username={this.state.username} haveControll={this.state.haveControll} roomId={this.state.roomId} socket={this.socket} />
             </div>
-
-            <Link to="/" onClick={this.leaveRoom}>
-              <button className="btn btn-primary btn-lg mx-auto d-block">
-                Leave Room
-              </button>
-            </Link>
           </React.Fragment>
         )
     }

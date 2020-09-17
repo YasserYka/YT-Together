@@ -76,8 +76,8 @@ class Chat extends Component {
         const { messages } = this.state;
 
         return (
-          <div className="w-50 h-100 p-3">
-            <div className="card-header">Messages </div>
+          <div className="w-50 p-3">
+            <div className="card-header text-center"> Chat <i class="fa fa-comments" aria-hidden="true"></i> </div>
 
             <ul className="list-group">
                 {

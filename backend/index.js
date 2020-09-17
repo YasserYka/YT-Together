@@ -11,10 +11,6 @@ wss.on('connection', ws => {
     });
 });
 
-server.listen(port, () => {
-    console.log(`Listening on ${port}!`);
-});
-
 //Sends Data-Payload to all users in specific room except the sender 
 const brodcastMessage = (data, users, ws) => {
     users.forEach(user => {
@@ -63,7 +59,9 @@ const assignControllAction = (data) => {
         });
 }
 
-const sendMessageToUser = (message, ws) => ws.send(JSON.stringify(message));
+const sendMessageToUser = (message, ws) => {
+    ws.send(JSON.stringify(message));
+}
 
 const findRoomWithId = id => {
     let roomFound;
@@ -160,3 +158,8 @@ const createRoom = (data, ws) => {
     rooms.push({roomId: data.roomId, users: [{username: data.username, ws: ws, haveControl: true}]});
     ws.send(JSON.stringify({event: 'control', action: 'youhavecontrol', youHaveControl: true}));
 }
+
+
+server.listen(port, () => {
+    console.log(`Listening on ${port}!`);
+});

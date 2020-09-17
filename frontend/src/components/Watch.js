@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 
 class Watch extends Component {
 
@@ -113,18 +114,26 @@ class Watch extends Component {
 
   render () {
       return (
-        <React.Fragment>
-          <div className="embed-responsive embed-responsive-16by9">
+        <div class="container">
+          <div className="embed-responsive embed-responsive-16by9 row">
             <div className="embed-responsive-item" id="player"></div>
           </div>
 
-          <form className="m-3"  onSubmit={this.handleOnVideoIdSubmit}>
-            <div className="form-group">
-              <input placeholder="Video ID" className="form-control" onChange={this.handleOnChangeVideoId} value={this.state.inputVideoId} required />
+          <form className="m-3 row"  onSubmit={this.handleOnVideoIdSubmit}>
+            <div className="form-group col">
+              <input placeholder="Video ID" className="form-control mb-3 " onChange={this.handleOnChangeVideoId} value={this.state.inputVideoId} required />
+              <button className="btn btn-primary mb-2 mx-auto d-block" type="submit">Change Video</button>
             </div>
-            <button className="btn btn-primary mb-2 mx-auto d-block" type="submit">Change Video</button>
+            <div class="col text-center">
+              <Link to="/" onClick={this.leaveRoom}>
+                <button className="btn btn-primary btn-lg">
+                  Leave Room
+                </button>
+              </Link>
+            </div>
           </form>
-        </React.Fragment>
+          
+        </div>
       )
   }
 }

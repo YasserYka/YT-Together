@@ -68,8 +68,8 @@ class Online extends Component {
 
         const { users } = this.state;
         return (
-            <div className="align-self-center w-50 p-3">
-                <div className="card-header">Online Users</div>
+            <div className="w-50 p-3">
+                <div className="card-header text-center"> Online <i class="fa fa-users" aria-hidden="true"></i> </div>
                 <ul className="list-group">
                     {
                         users.map((user, key) => (
