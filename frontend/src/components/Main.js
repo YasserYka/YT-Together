@@ -35,7 +35,9 @@ class Main extends Component {
           if(data.event === 'control')
             if(data.action == 'controller')
               this.setState({controller: true});
-      });
+            else if(data.action == 'guest')
+              this.setState({controller: false});
+          });
 
     }
 
@@ -50,7 +52,7 @@ class Main extends Component {
         <React.Fragment>
           <div className="d-flex justify-content-start m-5">
               <Chat username={this.state.username} roomId={this.state.roomId} socket={this.socket} />
-              <Watch controller={this.state.controller} socket={this.socket} />
+              <Watch controller={this.state.controller} roomId={this.state.roomId} socket={this.socket} />
               <Online username={this.state.username} controller={this.state.controller} roomId={this.state.roomId} socket={this.socket} />
           </div>
         </React.Fragment>

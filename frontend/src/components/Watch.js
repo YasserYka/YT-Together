@@ -51,7 +51,8 @@ class Watch extends Component {
   syncPause = () => {
     this.props.socket.send(JSON.stringify({
       event: "sync",
-      action: "pause"
+      action: "pause",
+      roomId: this.props.roomId
       })
     )
   };
@@ -83,11 +84,11 @@ class Watch extends Component {
       event: "sync", 
       action: "currenttime",
       currentTime: this.player.getCurrentTime(),
+      roomId: this.props.roomId
     })
   );
 
   changeState = triggered => {
-    console.log(this.props.controller)
     if(this.props.controller){
       if(triggered === 1)
         this.sync();
@@ -108,8 +109,11 @@ class Watch extends Component {
   handleOnVideoIdSubmit = event => {
     if(event)
       event.preventDefault();
-    if(this.props.controller)
-        this.player.loadVideoById(this.state.inputVideoId);
+    console.log(this.state.inputVideoId)
+    var regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/, match = this.state.inputVideoId.match(regExp);
+    console.log(this.props.controller, match && match[2].length == 11)
+    if(this.props.controller && match && match[2].length == 11)
+        this.player.loadVideoById(match[2]);
   }
 
   render () {
@@ -121,7 +125,7 @@ class Watch extends Component {
 
           <form className="m-3 row"  onSubmit={this.handleOnVideoIdSubmit}>
             <div className="form-group col">
-              <input placeholder="Video ID" className="form-control mb-3 " onChange={this.handleOnChangeVideoId} value={this.state.inputVideoId} required />
+              <input placeholder="Video URL" className="form-control mb-3 " onChange={this.handleOnChangeVideoId} value={this.state.inputVideoId} required />
               <button className="btn mb-2 mx-auto d-block" type="submit">Change Video</button>
             </div>
           </form>

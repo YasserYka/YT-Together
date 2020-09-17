@@ -38,10 +38,9 @@ class Online extends Component {
           roomId: this.props.roomId,
           username: this.props.username
         }));
-      }
+    }
 
     handleLeaveAction = data => {
-        console.log(data)
         this.setState({users: this.state.users.filter(user => user.username !== data.username)});
     }
 
@@ -53,25 +52,25 @@ class Online extends Component {
                 user.controller = true;
             else if(user.controller === true)
                 user.controller = false;
-        })
+        });
 
         this.setState({
             users: newUsers
-        })
+        });
     }
 
     giveControl = event => {
         if(event)
             event.preventDefault();
 
-        if(this.props.controllrt){
+            if(this.props.controller){
             this.props.socket.send(JSON.stringify({
                 event: 'control',
                 action: 'assign',
                 roomId: this.props.roomId,
                 toUsername: event.target.dataset.username,
                 username: this.props.username
-            }))
+            }));
         }
     }
 
