@@ -48,7 +48,7 @@ class Index extends Component {
                         <img src="/icon.png" id="icon" alt="User Icon" />
                     </div>
 
-                    <form>
+                    <form onSubmit={this.submitHandler}>
                         <input type="text" ref="username" placeholder="You Username" class="fadeIn second" required />
                         <input type="text" ref="roomId" placeholder="Room Id" class="fadeIn third" required />
                         <div className="custom-control custom-radio custom-control-inline">

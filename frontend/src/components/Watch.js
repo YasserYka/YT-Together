@@ -122,11 +122,11 @@ class Watch extends Component {
           <form className="m-3 row"  onSubmit={this.handleOnVideoIdSubmit}>
             <div className="form-group col">
               <input placeholder="Video ID" className="form-control mb-3 " onChange={this.handleOnChangeVideoId} value={this.state.inputVideoId} required />
-              <button className="btn btn-primary mb-2 mx-auto d-block" type="submit">Change Video</button>
+              <button className="btn mb-2 mx-auto d-block" type="submit">Change Video</button>
             </div>
             <div class="col text-center">
               <Link to="/" onClick={this.leaveRoom}>
-                <button className="btn btn-primary btn-lg">
+                <button className="btn btn-lg">
                   Leave Room
                 </button>
               </Link>
